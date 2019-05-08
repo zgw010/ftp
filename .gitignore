@@ -1,6 +1,6 @@
 node_modules
 **/ftpFile
 .vscode
-*.json
+fileList.json
 *.jpg
 *.png
