@@ -204,7 +204,9 @@ function createSocketConnection(mode, fileName, socketOption, instruction, cb, c
     streamIsFinish = socket.pipe(writeStream);
   } else if (mode === 'put') {
     readStream = fs.createReadStream(fileName);
-    streamIsFinish = readStream.pipe(socket);
+    streamIsFinish = readStream.pipe(socket).then(() => {
+      return fileName;  //返回的结果作为下个回调的参数
+    });
   }
   if (cb && (typeof cb == 'function')) {
     streamIsFinish.on('finish', function () { cb(cbOptions.dom, cbOptions.file) });
@@ -219,19 +221,12 @@ function createSocketConnection(mode, fileName, socketOption, instruction, cb, c
 let file = 'fileList.json';
 
 const root = document.querySelector('#left');
-createSocketConnection('get', file, { port: 8124 }, 'ls', createFileTreeDom, { dom: root, file });
+createSocketConnection('get', file, { port: 8124 }, 'ls', createFileTreeDom, { dom: root, file })
 
 // 打开程序的时候初始化一次, 需要向服务器发送 ls 请求, 接收从服务器发来的 JSON 格式的文件目录, 保存在本地
 // 之后根据 JSON 文件来构建 DOM 树.
 function createFileTreeDom(root, ftpServerFileList) {
-  ftpServerFileListJson = require('./' + ftpServerFileList).ftpFile;
-  // require(ftpServerFileListJson).ftpFile
-  // console.log(ftpServerFileListJson);
-  // ftpServerFileListJson = './'+ftpServerFileListJson
-  // console.log(createFileTreeDomRecursion();
-  // return;
-  // const root = document.querySelector('#left');
-  const newRoot = document.createElement('div');
+  const ftpServerFileListJson = require('./' + ftpServerFileList).ftpFile;
 
   const rootCatalogDom = document.createElement('div');
   rootCatalogDom.setAttribute('data', './ftpFile/ftpFile/')
@@ -240,6 +235,9 @@ function createFileTreeDom(root, ftpServerFileList) {
 
   const res = createFileTreeDomRecursion(ftpServerFileListJson);
   root.appendChild(res);
+
+  initHideSubFile('.catalogIcon');
+
 }
 function createFileTreeDomRecursion(file) {
   const currentFileList = Object.keys(file.children)
@@ -251,56 +249,55 @@ function createFileTreeDomRecursion(file) {
     // console.log(file[currentFile].htmlType);
     if (file[currentFile].htmlType === 'li') {
       const currentLiDom = document.createElement('li');
-      // currentLiDom.oncontextmenu = function (e) {
-      //   e.preventDefault();
-      // };
-      //在这里你就可以自己定义事件的函数啦
-      // currentLiDom.onmouseup = function (e) {
-      //   if (!e) e = window.event;
-      //   if (e.button == 2) {
-      //     let path = '';
-      //     let findRootPtr = e.target.parentElement;
-      //     // console.log(findRootPtr.tagName);
-      //     while (findRootPtr.tagName !== 'DIV') {
-      //       path = findRootPtr.previousElementSibling.getAttribute('data') + '/' + path;
-      //       // console.log(findRootPtr.previousElementSibling.getAttribute('data'));
-      //       findRootPtr = findRootPtr.parentElement;
+      currentLiDom.oncontextmenu = function (e) {
+        e.preventDefault();
+      };
+      // 定义右键函数
+      currentLiDom.onmouseup = function (e) {
+        if (!e) e = window.event;
+        if (e.button == 2) {
+          let path = '';
+          let totalLength = 0;
+          let findRootPtr = e.target.parentElement;
+          // console.log(findRootPtr.tagName);
+          while (findRootPtr.tagName !== 'DIV') {
+            path = findRootPtr.previousElementSibling.getAttribute('data') + '/' + path;
+            // console.log(findRootPtr.previousElementSibling.getAttribute('data'));
+            findRootPtr = findRootPtr.parentElement;
 
-      //     }
-      //     path = path + e.target.textContent;
+          }
+          path = path + e.target.textContent;
 
-      //     // 获取文件
-      //     // totalLength = 0;
-      //     const socket = net.createConnection({ port: 8124 }, () => {
-      //       console.log('connected to server!');
-      //     });
-      //     socket.on('data', (chunk) => {
-      //       totalLength += chunk.length;
-      //       console.log('recevied data size: ' + totalLength + 'KB');
-      //     });
-      //     socket.on('error', (er) => {
-      //       console.log(er);
-      //     })
-      //     socket.on('end', function () {
-      //       console.log('Connection end');
-      //     });
-      //     socket.on('close', function (e) {
-      //       console.log('Connection closed', e);
-      //     });
-      //     writeStream = fs.createWriteStream(e.target.textContent)
-      //     socket.pipe(writeStream);
-      //     socket.write('get ' + path, function () {
-      //       console.log(socket.destroyed);
-      //     })
+          // 获取文件
+          const socket = net.createConnection({ port: 8124 }, () => {
+            console.log('connected to server!');
+          });
+          socket.on('data', (chunk) => {
+            totalLength += chunk.length;
+            console.log('recevied data size: ' + totalLength + 'KB');
+          });
+          socket.on('error', (er) => {
+            console.log(er);
+          })
+          socket.on('end', function () {
+            console.log('Connection end');
+          });
+          socket.on('close', function (e) {
+            console.log('Connection closed', e);
+          });
+          writeStream = fs.createWriteStream(e.target.textContent)
+          socket.pipe(writeStream);
+          socket.write('get ' + path, function () {
+            console.log(socket.destroyed);
+          })
 
 
-      //   }
-      // }
+        }
+      }
       const currentLiContent = document.createTextNode(currentFile);
       currentLiDom.appendChild(currentLiContent);
       currentDom.appendChild(currentLiDom)
     } else if (file[currentFile].htmlType === 'ul') {
-      console.log('object', currentDom);
       const currentTreeDom = createFileTreeDomRecursion(file[currentFile])
 
       const catalogDom = document.createElement('div');
@@ -318,4 +315,26 @@ function createFileTreeDomRecursion(file) {
     }
   });
   return currentDom;
+
+
+}
+// 隐藏列表中子文件,并且添加点击 收起/展开 事件
+function initHideSubFile(buttonsClassName) {
+  const currentControlButtons = document.querySelectorAll(buttonsClassName);
+  // 给列表中按钮添加点击 收起/展开 事件
+  currentControlButtons.forEach(currentControlButton => {
+    currentControlButton.addEventListener('click', function (e) {
+      if (e.target.parentElement.nextElementSibling.style.display === 'none') {
+        e.target.textContent = '-';
+        e.target.parentElement.nextElementSibling.style.display = 'block';
+      } else {
+        e.target.textContent = '+';
+        e.target.parentElement.nextElementSibling.style.display = 'none';
+      }
+    })
+  });
+  // 隐藏列表中子文件
+  currentControlButtons.forEach(currentControlButton => {
+    currentControlButton.parentElement.nextElementSibling.style.display = 'none';
+  });
 }
