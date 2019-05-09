@@ -6,7 +6,7 @@ const ftpServerFileListJSONFile = 'fileList.json';
 
 let readerStream, writeStream;
 let ftpServerFileTree = {};
-let ftpServerFileRootPath = '/home/z/ftp_client/node_ftp/s/ftpFile';
+let ftpServerFileRootPath = '/home/z/ftp/node_ftp/s/ftpFile';
 
 
 const server = net.createServer({ allowHalfOpen: true }, (socket) => {
