@@ -5,8 +5,7 @@ const fs = require('fs');
 // socketOption(object): {port:number,ip:string}
 // instruction(function): send a command to the server
 // [cb(function)]: when pipe finish call this function
-
-function createSocketConnection(mode, fileName, socketOption, instruction, cb, cbOptions) {
+function createSocketConnection(fileName, mode, socketOption, instruction, cb, cbOptions) {
   let totalLength = 0;
   let writeStream, streamIsFinish, readStream;
   const socket = net.createConnection(socketOption, () => {

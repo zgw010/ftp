@@ -1,4 +1,4 @@
-const createSocketConnection = require('./networkCommunication').createSocketConnection
+const { createSocketConnection } = require('./networkCommunication');
 const ftpOptions = { port: 8124 };
 function createFileTreeDomRecursion(file) {
   const currentFileList = Object.keys(file.children)
@@ -10,33 +10,64 @@ function createFileTreeDomRecursion(file) {
     // console.log(file[currentFile].htmlType);
     if (file[currentFile].htmlType === 'li') {
       const currentLiDom = document.createElement('li');
-      currentLiDom.addEventListener('mouseup', function (e) {
-        if (e.button == 2) {
-          // 获取文件的相对路径
-          let path = '';
-          let findRootPtr = e.target.parentElement;
-          while (findRootPtr.tagName !== 'DIV') {
-            path = findRootPtr.previousElementSibling.getAttribute('data-path') + '/' + path;
-            findRootPtr = findRootPtr.parentElement;
-          }
-          path = path + e.target.textContent;
-          // 获取文件保存在本地
-          createSocketConnection('get', e.target.textContent, ftpOptions, 'get ' + path, null, null)
-          createMouseEventDom({ clientX: e.clientX, clientY: e.clientY }, path)
+      currentLiDom.setAttribute('draggable', 'true')
+      // // currentLiDom.addEventListener('drag', function (e) {
+      // //   // console.log(e);
+      // //   // console.log('object');
+      // // })
+      // currentLiDom.addEventListener("dragstart", function (event) {
+      //   // 保存拖动元素的引用(ref.)
+      //   console.log(event.target);
+      //   event.target.style.opacity = .5;
+      //   localStorage.setItem('dom', event.target.textContent);
+      //   // dragged = event.target;
+      //   // 使其半透明
+      //   // event.target.style.opacity = .5;
+      // }, false);
+      // currentLiDom.addEventListener("dragend", function (event) {
+      //   // 重置透明度
+      //   event.target.style.opacity = "";
+      //   console.log(localStorage.getItem('dom'));
+      // }, false);
 
-        }
-        // return;
-        // if (!e) e = window.event;
+      // /* 放置目标元素时触发事件 */
+      // currentLiDom.addEventListener("dragover", function (event) {
+      //   // 阻止默认动作以启用drop
+      //   event.preventDefault();
+      // }, false);
+      // currentLiDom.addEventListener("dragenter", function (event) {
+      //   // 当可拖动的元素进入可放置的目标时高亮目标节点
+      //   if (event.target.tagName == "LI") {
+      //     event.target.style.background = "purple";
+      //   }
 
-      })
-      currentLiDom.oncontextmenu = function (e) {
-        e.preventDefault();
-      };
-      // 定义右键函数
-      // currentLiDom.onmouseup = function (e) {
-      //   console.log(e);
+      // }, false);
+      // currentLiDom.addEventListener("dragleave", function (event) {
+      //   // 当拖动元素离开可放置目标节点，重置其背景
+      //   if (event.target.tagName == "LI") {
+      //     event.target.style.background = "";
+      //   }
 
-      // }
+      // }, false);
+
+      // currentLiDom.addEventListener('mouseup', function (e) {
+      //   if (e.button == 2) {
+      //     // 获取文件的相对路径
+      //     let path = '';
+      //     let findRootPtr = e.target.parentElement;
+      //     while (findRootPtr.tagName !== 'DIV') {
+      //       path = findRootPtr.previousElementSibling.getAttribute('data-path') + '/' + path;
+      //       findRootPtr = findRootPtr.parentElement;
+      //     }
+      //     path = path + e.target.textContent;
+      //     // 获取文件保存在本地
+      //     // createSocketConnection('get', e.target.textContent, ftpOptions, 'get ' + path, null, null)
+      //     removeMouseRightPopup();
+      //     createMouseEventDom({ clientX: e.clientX, clientY: e.clientY }, path)
+
+      //   }
+      // })
+
       const currentLiContent = document.createTextNode(currentFile);
       currentLiDom.appendChild(currentLiContent);
       currentDom.appendChild(currentLiDom)
@@ -62,20 +93,19 @@ function createFileTreeDomRecursion(file) {
 
 }
 function createMouseEventDom(mouseSite, path) {
-  console.log(mouseSite);
   const mouseRightDom = document.createElement('div');
-  mouseRightDom.setAttribute('class', 'mouseRightPopup')
+  mouseRightDom.setAttribute('id', 'mouseRightPopup')
   mouseRightDom.setAttribute('data-path', path)
-  // console.log(mouseRightDom.style);
   mouseRightDom.style.top = mouseSite.clientY + 'px';
-  console.log(mouseRightDom.style.top);
   mouseRightDom.style.left = mouseSite.clientX + 'px';
-
-  const mouseRightDomCopy = document.createElement('div');
-  const mouseRightDomCopyContext = document.createTextNode('copy');
-  mouseRightDomCopy.appendChild(mouseRightDomCopyContext);
-  const mouseRightDomPaste = document.createElement('div');
-  const mouseRightDomDelete = document.createElement('div');
+  const fileName = path.slice(path.lastIndexOf('/') + 1)
+  const mouseRightDomRefresh = createMouseRightMenuElement('refresh', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
+  const mouseRightDomDownload = createMouseRightMenuElement('download', createSocketConnection, [fileName, 'get', ftpOptions, 'get ' + path, null, null]);
+  const mouseRightDomCopy = createMouseRightMenuElement('copy', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
+  const mouseRightDomPaste = createMouseRightMenuElement('paste', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
+  const mouseRightDomDelete = createMouseRightMenuElement('delete', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
+  mouseRightDom.appendChild(mouseRightDomRefresh);
+  mouseRightDom.appendChild(mouseRightDomDownload);
   mouseRightDom.appendChild(mouseRightDomCopy);
   mouseRightDom.appendChild(mouseRightDomPaste);
   mouseRightDom.appendChild(mouseRightDomDelete);
@@ -94,8 +124,27 @@ function createFileDomTree(fileTreeJSON, domId, path) {
   const fileListDom = createFileTreeDomRecursion({ htmlType: 'ul', children: fileTreeJSON });
   rootDom.appendChild(fileListDom);
 }
+function createMouseRightMenuElement(elementContext, addEventListenerFunction, addEventListenerFunctionArguments) {
+  const element = document.createElement('div');
+  element.appendChild(document.createTextNode(elementContext));
+  element.addEventListener('click', function () {
+    // addEventListenerFunction(e)
+    // if
+    console.log(addEventListenerFunctionArguments[0]);
+    addEventListenerFunction(...addEventListenerFunctionArguments)
+    // createSocketConnection('get', e.target.textContent, ftpOptions, 'get ' + path, null, null)
+  })
+  return element;
+}
+function removeMouseRightPopup() {
+  const mouseRightPopup = document.querySelector('#mouseRightPopup');
+  if (mouseRightPopup) {
+    mouseRightPopup.parentElement.removeChild(document.querySelector('#mouseRightPopup'));
+  }
+}
 module.exports = {
   // createFileTreeDomRecursion,
   // addFileRootPath,
-  createFileDomTree
+  createFileDomTree,
+  removeMouseRightPopup
 };
