@@ -16,12 +16,12 @@ function createFileTreeDomRecursion(file) {
           let path = '';
           let findRootPtr = e.target.parentElement;
           while (findRootPtr.tagName !== 'DIV') {
-            path = findRootPtr.previousElementSibling.getAttribute('data') + '/' + path;
+            path = findRootPtr.previousElementSibling.getAttribute('data-path') + '/' + path;
             findRootPtr = findRootPtr.parentElement;
           }
           path = path + e.target.textContent;
           // 获取文件保存在本地
-          // createSocketConnection('get', e.target.textContent, ftpOptions, 'get ' + path, null, null)
+          createSocketConnection('get', e.target.textContent, ftpOptions, 'get ' + path, null, null)
           createMouseEventDom({ clientX: e.clientX, clientY: e.clientY }, path)
 
         }
@@ -44,7 +44,7 @@ function createFileTreeDomRecursion(file) {
       const currentTreeDom = createFileTreeDomRecursion(file[currentFile])
 
       const catalogDom = document.createElement('div');
-      catalogDom.setAttribute('data', `${currentFile}`)
+      catalogDom.setAttribute('data-path', `${currentFile}`)
       const catalogDomIcon = document.createElement('div');
       catalogDomIcon.appendChild(document.createTextNode('+'));
       const catalogDomContent = document.createTextNode(currentFile);
@@ -81,7 +81,21 @@ function createMouseEventDom(mouseSite, path) {
   mouseRightDom.appendChild(mouseRightDomDelete);
   document.body.appendChild(mouseRightDom)
 }
+function addFileRootPath(root, path, ) {
+  const rootCatalogDom = document.createElement('div');
+  rootCatalogDom.setAttribute('data-path', path)
+  root.appendChild(rootCatalogDom);
+}
 
+function createFileDomTree(fileTreeJSON, domId, path) {
+  let rootDom = document.querySelector(`#${domId}`);
+
+  addFileRootPath(rootDom, path)
+  const fileListDom = createFileTreeDomRecursion({ htmlType: 'ul', children: fileTreeJSON });
+  rootDom.appendChild(fileListDom);
+}
 module.exports = {
-  createFileTreeDomRecursion
+  // createFileTreeDomRecursion,
+  // addFileRootPath,
+  createFileDomTree
 };

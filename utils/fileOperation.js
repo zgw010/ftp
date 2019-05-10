@@ -17,6 +17,6 @@ function readDirSync(path, fileTreeObject = {}) {
   return fileTreeObject;
 }
 
-module.exports ={
+module.exports = {
   readDirSync
 }
