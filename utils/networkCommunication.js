@@ -30,9 +30,7 @@ function createSocketConnection(mode, fileName, socketOption, instruction, cb, c
     streamIsFinish = socket.pipe(writeStream);
   } else if (mode === 'put') {
     readStream = fs.createReadStream(fileName);
-    streamIsFinish = readStream.pipe(socket).then(() => {
-      return fileName;  //返回的结果作为下个回调的参数
-    });
+    streamIsFinish = readStream.pipe(socket);
   }
   if (cb && (typeof cb == 'function')) {
     streamIsFinish.on('finish', function () { cb(cbOptions.dom, cbOptions.file) });
