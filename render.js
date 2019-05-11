@@ -22,7 +22,7 @@ function initServerFileListTree() {
 // 之后根据 JSON 文件来构建 DOM 树.
 function createServerFileTreeDom(root, ftpServerFileList) {
   const ftpServerFileListJson = require('./' + ftpServerFileList);
-  createFileDomTree(ftpServerFileListJson, 'left', './ftpFile');
+  createFileDomTree(ftpServerFileListJson, 'left', '/home/z/ftp/node_ftp/s/ftpFile');
   initHideSubFile('.catalogIcon');
 }
 

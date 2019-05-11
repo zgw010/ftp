@@ -16,7 +16,16 @@ function readDirSync(path, fileTreeObject = {}) {
   })
   return fileTreeObject;
 }
-
+function deleteFileSync(file){
+  try {
+    fs.unlinkSync(file);
+    console.log(`已成功删除 ${file} `);
+  } catch (err) {
+    // 处理错误
+    console.log(`删除文件 [${file}] 出错`);
+  }
+}
 module.exports = {
-  readDirSync
+  readDirSync,
+  deleteFileSync
 }

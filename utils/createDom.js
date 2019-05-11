@@ -1,6 +1,7 @@
 const { createSocketConnection } = require('./networkCommunication');
 const { findAllParentElementDataPath } = require('./findFromDom');
 const { getFileNameFromPath } = require('./utils');
+const {deleteFileSync} = require('./fileOperation')
 const ftpOptions = { port: 8124 };
 function createFileTreeDomRecursion(file) {
   const currentFileList = Object.keys(file.children)
@@ -100,7 +101,7 @@ function createMouseEventDom(mouseSite, path) {
   const mouseRightDomDownload = createMouseRightMenuElement('download', createSocketConnection, [fileName, 'get', ftpOptions, 'get ' + path, null, null]);
   const mouseRightDomCopy = createMouseRightMenuElement('copy', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
   const mouseRightDomPaste = createMouseRightMenuElement('paste', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
-  const mouseRightDomDelete = createMouseRightMenuElement('delete', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
+  const mouseRightDomDelete = createMouseRightMenuElement('delete', deleteFileSync, [path]);
   mouseRightDom.appendChild(mouseRightDomRefresh);
   mouseRightDom.appendChild(mouseRightDomDownload);
   mouseRightDom.appendChild(mouseRightDomCopy);
