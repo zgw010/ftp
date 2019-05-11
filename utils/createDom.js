@@ -1,64 +1,22 @@
 const { createSocketConnection } = require('./networkCommunication');
 const { findAllParentElementDataPath } = require('./findFromDom');
 const { getFileNameFromPath } = require('./utils');
-const {deleteFileSync} = require('./fileOperation')
+const { deleteFileSync } = require('./fileOperation')
 const ftpOptions = { port: 8124 };
 function createFileTreeDomRecursion(file) {
   const currentFileList = Object.keys(file.children)
-  // console.log(currentFileList);
   const currentDom = document.createElement(file.htmlType);
-  // console.log(currentDom);
   file = file.children;
   currentFileList.forEach(currentFile => {
     // console.log(file[currentFile].htmlType);
     if (file[currentFile].htmlType === 'li') {
       const currentLiDom = document.createElement('li');
       currentLiDom.setAttribute('draggable', 'true')
-      
-      // // currentLiDom.addEventListener('drag', function (e) {
-      // //   // console.log(e);
-      // //   // console.log('object');
-      // // })
-      // currentLiDom.addEventListener("dragstart", function (event) {
-      //   // 保存拖动元素的引用(ref.)
-      //   console.log(event.target);
-      //   event.target.style.opacity = .5;
-      //   localStorage.setItem('dom', event.target.textContent);
-      //   // dragged = event.target;
-      //   // 使其半透明
-      //   // event.target.style.opacity = .5;
-      // }, false);
-      // currentLiDom.addEventListener("dragend", function (event) {
-      //   // 重置透明度
-      //   event.target.style.opacity = "";
-      //   console.log(localStorage.getItem('dom'));
-      // }, false);
-
-      // /* 放置目标元素时触发事件 */
-      // currentLiDom.addEventListener("dragover", function (event) {
-      //   // 阻止默认动作以启用drop
-      //   event.preventDefault();
-      // }, false);
-      // currentLiDom.addEventListener("dragenter", function (event) {
-      //   // 当可拖动的元素进入可放置的目标时高亮目标节点
-      //   if (event.target.tagName == "LI") {
-      //     event.target.style.background = "purple";
-      //   }
-
-      // }, false);
-      // currentLiDom.addEventListener("dragleave", function (event) {
-      //   // 当拖动元素离开可放置目标节点，重置其背景
-      //   if (event.target.tagName == "LI") {
-      //     event.target.style.background = "";
-      //   }
-
-      // }, false);
 
       currentLiDom.addEventListener('mouseup', function (e) {
         if (e.button == 2) {
           const path = findAllParentElementDataPath(e.target) + e.target.textContent;
           // 获取文件保存在本地
-          // createSocketConnection('get', e.target.textContent, ftpOptions, 'get ' + path, null, null)
           removeMouseRightPopup();
           createMouseEventDom({ clientX: e.clientX, clientY: e.clientY }, path)
 
@@ -130,11 +88,7 @@ function createMouseRightMenuElement(elementContext, addEventListenerFunction, a
   const element = document.createElement('div');
   element.appendChild(document.createTextNode(elementContext));
   element.addEventListener('click', function () {
-    // addEventListenerFunction(e)
-    // if
-    console.log(addEventListenerFunctionArguments[0]);
     addEventListenerFunction(...addEventListenerFunctionArguments)
-    // createSocketConnection('get', e.target.textContent, ftpOptions, 'get ' + path, null, null)
   })
   return element;
 }
@@ -147,8 +101,6 @@ function removeMouseRightPopup() {
   }
 }
 module.exports = {
-  // createFileTreeDomRecursion,
-  // addFileRootPath,
   createFileDomTree,
   removeMouseRightPopup
 };
