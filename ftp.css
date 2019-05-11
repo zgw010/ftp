@@ -47,25 +47,45 @@ body {
   padding: 0;
   width: 100vw;
   height: 100vh;
-  /* user-select:none; */
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif, Helvetica;
+  font-size: 20px;
 }
-ol,
+
 ul {
   list-style: none;
 }
-ul,
+li {
+  width: fit-content;
+}
+/* ul,
 menu,
 dir {
-  padding-inline-start: 20px;
+  padding-inline-start: 30px;
+} */
+#dragMenu {
+  -webkit-app-region: drag;
+  height: 30px;
+  background-color: #f5f5f5;
+  line-height: 30px;
+  text-align: center;
 }
-
 #root {
   display: flex;
+  margin: 5px;
 }
-#left {
+.file-tree-title {
+  text-align: center;
+  margin: 5px 80px;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 24px;
+}
+#left-box {
+  box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #ddd, 0 0 5px 3px #eeeeee;
   flex: 1;
 }
-#right {
+#right-box {
+  box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #ddd, 0 0 5px 3px #eeeeee;
   flex: 1;
 }
 
@@ -73,24 +93,37 @@ dir {
   display: list-item;
   text-align: -webkit-match-parent;
   margin: 0;
+  width: fit-content;
+}
+.catalog:hover {
+  cursor: grab;
+  background-color: #f5f5f5;
 }
 .catalogIcon {
   display: inline-block;
+  width: 15px;
+  margin-left: -15px;
+  font-weight: 900;
 }
 .catalogIcon:hover {
   cursor: pointer;
 }
 li:hover {
   cursor: grab;
+  background-color: #f5f5f5;
 }
+
+
+#help {
+  margin: 10px 0 0 20px;
+}
+
+
 #mouseRightPopup {
   position: absolute;
   width: 150px;
-  /* height: 300px; */
   background-color: #fff;
-  /* border: 1px solid #f5f5f5; */
   font-size: 18px;
-  /* box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2); */
   box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #ddd, 0 0 5px 3px #eeeeee;
   border-radius: 1px;
 }
@@ -105,3 +138,4 @@ li:hover {
 #mouseRightPopup div:first-child {
   border-top: none;
 }
+

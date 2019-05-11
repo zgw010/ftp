@@ -27,16 +27,21 @@ function createSocketConnection(fileName, mode, socketOption, instruction, cb, c
   if (mode === 'get') {
     writeStream = fs.createWriteStream(fileName);
     streamIsFinish = socket.pipe(writeStream);
-  } else if (mode === 'put') {
-    readStream = fs.createReadStream(fileName);
-    streamIsFinish = readStream.pipe(socket);
   }
   if (cb && (typeof cb == 'function')) {
     streamIsFinish.on('finish', function () { cb(cbOptions.dom, cbOptions.file) });
   }
   if (instruction) {
+    socket.write(instruction, function () {
+      if (mode === 'put') {
+        readStream = fs.createReadStream(fileName);
+        streamIsFinish = readStream.pipe(socket);
+        streamIsFinish.on('finish', function () {
+          socket.end();
+        })
+      }
+    });
     console.log('instruction', instruction);
-    socket.write(instruction);
   } else {
     console.log('error, lack instruction');
   }

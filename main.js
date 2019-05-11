@@ -6,10 +6,41 @@ let mainWindow
 function createWindow() {
   // Create the browser window.
   // Menu.setApplicationMenu(null)
+  const template = [
+
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forcereload' },
+      ]
+    },
+    {
+      role: 'window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'close' }
+      ]
+    },
+    {
+      role: 'help',
+      submenu: [
+        {
+          label: 'Learn More',
+          click() { require('electron').shell.openExternal('https://google.com') }
+        }
+      ]
+    }
+  ]
+
+
+
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    // frame: false,
+    width: 1100,
+    height: 800,
+    frame: false,
     webPreferences: {
       nodeIntegration: true
     }

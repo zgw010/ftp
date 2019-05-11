@@ -12,11 +12,26 @@
   <!-- All of the Node.js APIs are available in this renderer process. -->
 
   <!-- <a href="#" id="drag">item</a> -->
+  <div id="dragMenu">FTP client</div>
   <div id="root">
-    <div id="left">
+    <div id="left-box">
+      <div class="file-tree-title">server file</div>
+      <div id="left">
+      </div>
     </div>
-    <div id="right">
+    <div id="right-box">
+      <div class="file-tree-title">local file</div>
+      <div id="right">
+      </div>
     </div>
+  </div>
+  <div id="help">
+    <div>
+      帮助说明:
+    </div>
+    <div>1. 操作: 拖拽文件 / 鼠标右键打开菜单选择选项</div>
+    <div>2. 按 ctrl + R 刷新文件列表</div>
+    <div>3. 按 ctrl + W 退出应用</div>
   </div>
   <script>
     // You can also require other files to run in this process

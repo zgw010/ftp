@@ -1,6 +1,7 @@
 const { createFileDomTree, removeMouseRightPopup } = require('./utils/createDom')
 const { createSocketConnection } = require('./utils/networkCommunication');
-const {readDirSync} = require('./utils/fileOperation');
+const { readDirSync } = require('./utils/fileOperation');
+const { addDragListener } = require('./utils/eventListener');
 
 //处理本地文件
 function createLocalFileTreeDom(path, domId = 'right') {
@@ -44,45 +45,10 @@ function initHideSubFile(buttonsClassName) {
   currentControlButtons.forEach(currentControlButton => {
     currentControlButton.parentElement.nextElementSibling.style.display = 'none';
   });
-  // document.addEventListener('drag', function (e) {
-  //   // console.log(e);
-  //   // console.log('object');
-  // })
-  document.addEventListener("dragstart", function (event) {
-    // 保存拖动元素的引用(ref.)
-    console.log(event.target);
-    event.target.style.opacity = .5;
-    localStorage.setItem('dom', event.target.textContent);
-    // dragged = event.target;
-    // 使其半透明
-    // event.target.style.opacity = .5;
-  }, false);
-  document.addEventListener("dragend", function (event) {
-    // 重置透明度
-    event.target.style.opacity = "";
-    console.log(localStorage.getItem('dom'));
-  }, false);
 
-  /* 放置目标元素时触发事件 */
-  document.addEventListener("dragover", function (event) {
-    // 阻止默认动作以启用drop
-    event.preventDefault();
-  }, false);
-  document.addEventListener("dragenter", function (event) {
-    // 当可拖动的元素进入可放置的目标时高亮目标节点
-    if (event.target.tagName == "LI") {
-      event.target.style.background = "purple";
-    }
 
-  }, false);
-  document.addEventListener("dragleave", function (event) {
-    // 当拖动元素离开可放置目标节点，重置其背景
-    if (event.target.tagName == "LI") {
-      event.target.style.background = "";
-    }
-
-  }, false);
 }
+
 function init() {
   createLocalFileTreeDom('/home/z/blog', 'right');
   // 生成服务器目录树,之后调用 createServerFileTreeDom 来根据 JSON 文件构造服务器目录 DOM 树
@@ -91,8 +57,11 @@ function init() {
   window.addEventListener('click', function () {
     removeMouseRightPopup();
   })
-  window.addEventListener('mousedown', function () {
-    removeMouseRightPopup();
+  window.addEventListener('mousedown', function (e) {
+    if (e.button == 2) {
+      removeMouseRightPopup();
+    }
   })
+  addDragListener()
 }
 init();

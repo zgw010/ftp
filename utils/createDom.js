@@ -1,4 +1,6 @@
 const { createSocketConnection } = require('./networkCommunication');
+const { findAllParentElementDataPath } = require('./findFromDom');
+const { getFileNameFromPath } = require('./utils');
 const ftpOptions = { port: 8124 };
 function createFileTreeDomRecursion(file) {
   const currentFileList = Object.keys(file.children)
@@ -11,6 +13,7 @@ function createFileTreeDomRecursion(file) {
     if (file[currentFile].htmlType === 'li') {
       const currentLiDom = document.createElement('li');
       currentLiDom.setAttribute('draggable', 'true')
+      
       // // currentLiDom.addEventListener('drag', function (e) {
       // //   // console.log(e);
       // //   // console.log('object');
@@ -50,23 +53,16 @@ function createFileTreeDomRecursion(file) {
 
       // }, false);
 
-      // currentLiDom.addEventListener('mouseup', function (e) {
-      //   if (e.button == 2) {
-      //     // 获取文件的相对路径
-      //     let path = '';
-      //     let findRootPtr = e.target.parentElement;
-      //     while (findRootPtr.tagName !== 'DIV') {
-      //       path = findRootPtr.previousElementSibling.getAttribute('data-path') + '/' + path;
-      //       findRootPtr = findRootPtr.parentElement;
-      //     }
-      //     path = path + e.target.textContent;
-      //     // 获取文件保存在本地
-      //     // createSocketConnection('get', e.target.textContent, ftpOptions, 'get ' + path, null, null)
-      //     removeMouseRightPopup();
-      //     createMouseEventDom({ clientX: e.clientX, clientY: e.clientY }, path)
+      currentLiDom.addEventListener('mouseup', function (e) {
+        if (e.button == 2) {
+          const path = findAllParentElementDataPath(e.target) + e.target.textContent;
+          // 获取文件保存在本地
+          // createSocketConnection('get', e.target.textContent, ftpOptions, 'get ' + path, null, null)
+          removeMouseRightPopup();
+          createMouseEventDom({ clientX: e.clientX, clientY: e.clientY }, path)
 
-      //   }
-      // })
+        }
+      })
 
       const currentLiContent = document.createTextNode(currentFile);
       currentLiDom.appendChild(currentLiContent);
@@ -75,6 +71,7 @@ function createFileTreeDomRecursion(file) {
       const currentTreeDom = createFileTreeDomRecursion(file[currentFile])
 
       const catalogDom = document.createElement('div');
+      catalogDom.setAttribute('draggable', 'true')
       catalogDom.setAttribute('data-path', `${currentFile}`)
       const catalogDomIcon = document.createElement('div');
       catalogDomIcon.appendChild(document.createTextNode('+'));
@@ -98,7 +95,7 @@ function createMouseEventDom(mouseSite, path) {
   mouseRightDom.setAttribute('data-path', path)
   mouseRightDom.style.top = mouseSite.clientY + 'px';
   mouseRightDom.style.left = mouseSite.clientX + 'px';
-  const fileName = path.slice(path.lastIndexOf('/') + 1)
+  const fileName = getFileNameFromPath(path);
   const mouseRightDomRefresh = createMouseRightMenuElement('refresh', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
   const mouseRightDomDownload = createMouseRightMenuElement('download', createSocketConnection, [fileName, 'get', ftpOptions, 'get ' + path, null, null]);
   const mouseRightDomCopy = createMouseRightMenuElement('copy', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
@@ -111,6 +108,8 @@ function createMouseEventDom(mouseSite, path) {
   mouseRightDom.appendChild(mouseRightDomDelete);
   document.body.appendChild(mouseRightDom)
 }
+
+// 给文件列表树的根添加一个头部
 function addFileRootPath(root, path, ) {
   const rootCatalogDom = document.createElement('div');
   rootCatalogDom.setAttribute('data-path', path)
@@ -124,6 +123,8 @@ function createFileDomTree(fileTreeJSON, domId, path) {
   const fileListDom = createFileTreeDomRecursion({ htmlType: 'ul', children: fileTreeJSON });
   rootDom.appendChild(fileListDom);
 }
+
+// 创建鼠标右键菜单中的一个选项
 function createMouseRightMenuElement(elementContext, addEventListenerFunction, addEventListenerFunctionArguments) {
   const element = document.createElement('div');
   element.appendChild(document.createTextNode(elementContext));
@@ -136,6 +137,8 @@ function createMouseRightMenuElement(elementContext, addEventListenerFunction, a
   })
   return element;
 }
+
+// 移除鼠标右键菜单
 function removeMouseRightPopup() {
   const mouseRightPopup = document.querySelector('#mouseRightPopup');
   if (mouseRightPopup) {
