@@ -83,10 +83,14 @@ dir {
 #left-box {
   box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #ddd, 0 0 5px 3px #eeeeee;
   flex: 1;
+  overflow-y: auto;
+  height: 630px;
 }
 #right-box {
   box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #ddd, 0 0 5px 3px #eeeeee;
   flex: 1;
+  overflow-y: auto;
+  height: 630px;
 }
 
 .catalog {
@@ -113,11 +117,9 @@ li:hover {
   background-color: #f5f5f5;
 }
 
-
 #help {
   margin: 10px 0 0 20px;
 }
-
 
 #mouseRightPopup {
   position: absolute;
@@ -139,3 +141,47 @@ li:hover {
   border-top: none;
 }
 
+/* 弹窗样式 */
+.popup {
+  display: none;
+  width: 280px;
+  /* height: 140px; */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  background: #fff;
+  /* border: 1px solid #ddd; */
+  border-radius: 3px;
+  font-size: 18px;
+}
+.popup-head {
+  text-align: center;
+  border-bottom: 1px solid #f5f5f5;
+  color: gray;
+}
+.popup-body {
+  text-align: center;
+  /* align-items:  */
+  margin: 20px 10px 30px 10px;
+}
+.popup-botton {
+  text-align: center;
+  /* border-radius: 4px; */
+  background-color: #46a3ff;
+  color: white;
+  height: 30px;
+}
+.popup-botton:hover {
+  cursor: pointer;
+}
+.popup-bg {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+}

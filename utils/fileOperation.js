@@ -1,4 +1,6 @@
 const fs = require('fs')
+const { showPromptPopup } = require('./utils')
+
 function readDirSync(dir, fileTreeObject = {}) {
   var pathList = fs.readdirSync(dir);
   pathList.forEach(function (fileName) {
@@ -16,18 +18,25 @@ function readDirSync(dir, fileTreeObject = {}) {
 }
 function deleteFileSync(dir) {
   try {
+    console.log(fs.statSync(dir).isDirectory());
+    if (fs.statSync(dir).isDirectory()) {
+      deleteDirectorySync(dir);
+      showPromptPopup('删除文件夹成功')
+      return;
+    }
     fs.unlinkSync(dir);
-    console.log(`已成功删除 ${dir} `);
+    showPromptPopup('删除文件成功')
   } catch (err) {
     // 处理错误
+    console.log(err);
     console.log(`删除文件 [${dir}] 出错`);
   }
 }
 
 function deleteDirectorySync(dir) {
   const files = fs.readdirSync(dir);
-  const newPath = `${dir}/${files[i]}`;
   for (let i = 0; i < files.length; i++) {
+    const newPath = `${dir}/${files[i]}`;
     const info = fs.statSync(newPath)
     if (info.isDirectory()) {
       //如果是文件夹就递归下去

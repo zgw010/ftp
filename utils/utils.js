@@ -1,7 +1,13 @@
-function getFileNameFromPath(path){
+function getFileNameFromPath(path) {
   return path.slice(path.lastIndexOf('/') + 1);
 }
 
-module.exports={
-  getFileNameFromPath
+function showPromptPopup(text) {
+  document.querySelector('.popup-body').textContent = text;
+  document.querySelector('.popup-bg').style.display = 'block';
+  document.querySelector('.popup').style.display = 'block';
+}
+module.exports = {
+  getFileNameFromPath,
+  showPromptPopup
 }

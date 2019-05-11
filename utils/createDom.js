@@ -1,7 +1,9 @@
 const { createSocketConnection } = require('./networkCommunication');
 const { findAllParentElementDataPath } = require('./findFromDom');
-const { getFileNameFromPath } = require('./utils');
+const { removeDom } = require('./removeDom')
 const { deleteFileSync } = require('./fileOperation')
+const { getFileNameFromPath } = require('./utils');
+
 const ftpOptions = { port: 8124 };
 function createFileTreeDomRecursion(file) {
   const currentFileList = Object.keys(file.children)
@@ -17,20 +19,29 @@ function createFileTreeDomRecursion(file) {
         if (e.button == 2) {
           const path = findAllParentElementDataPath(e.target) + e.target.textContent;
           removeMouseRightPopup();
-          createMouseEventDom({ clientX: e.clientX, clientY: e.clientY }, path)
+          createMouseEventDom(e.target, { clientX: e.clientX, clientY: e.clientY }, path)
 
         }
       })
 
       const currentLiContent = document.createTextNode(currentFile);
       currentLiDom.appendChild(currentLiContent);
-      currentDom.appendChild(currentLiDom)
+      currentDom.appendChild(currentLiDom);
     } else if (file[currentFile].htmlType === 'ul') {
-      const currentTreeDom = createFileTreeDomRecursion(file[currentFile])
+      const currentTreeDom = createFileTreeDomRecursion(file[currentFile]);
 
       const catalogDom = document.createElement('div');
-      catalogDom.setAttribute('draggable', 'true')
-      catalogDom.setAttribute('data-path', `${currentFile}`)
+      catalogDom.setAttribute('draggable', 'true');
+      catalogDom.setAttribute('data-path', `${currentFile}`);
+
+      catalogDom.addEventListener('mouseup', function (e) {
+        if (e.button == 2) {
+          const path = findAllParentElementDataPath(e.target) + currentFile;
+          removeMouseRightPopup();
+          createMouseEventDom(e.target, { clientX: e.clientX, clientY: e.clientY }, path);
+
+        }
+      })
       const catalogDomIcon = document.createElement('div');
       catalogDomIcon.appendChild(document.createTextNode('+'));
       const catalogDomContent = document.createTextNode(currentFile);
@@ -47,7 +58,12 @@ function createFileTreeDomRecursion(file) {
 
 
 }
-function createMouseEventDom(mouseSite, path) {
+
+function deleteFileAndRemoveDom(dom,dir) {
+  removeDom(dom);
+  deleteFileSync(dir);
+}
+function createMouseEventDom(dom, mouseSite, path) {
   const mouseRightDom = document.createElement('div');
   mouseRightDom.setAttribute('id', 'mouseRightPopup')
   mouseRightDom.setAttribute('data-path', path)
@@ -58,7 +74,7 @@ function createMouseEventDom(mouseSite, path) {
   const mouseRightDomDownload = createMouseRightMenuElement('download', createSocketConnection, [fileName, 'get', ftpOptions, 'get ' + path, null, null]);
   const mouseRightDomCopy = createMouseRightMenuElement('copy', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
   const mouseRightDomPaste = createMouseRightMenuElement('paste', createSocketConnection, [path, 'get', ftpOptions, 'get ' + path, null, null]);
-  const mouseRightDomDelete = createMouseRightMenuElement('delete', deleteFileSync, [path]);
+  const mouseRightDomDelete = createMouseRightMenuElement('delete', deleteFileAndRemoveDom, [dom, path]);
   mouseRightDom.appendChild(mouseRightDomRefresh);
   mouseRightDom.appendChild(mouseRightDomDownload);
   mouseRightDom.appendChild(mouseRightDomCopy);
@@ -99,7 +115,40 @@ function removeMouseRightPopup() {
     mouseRightPopup.parentElement.removeChild(document.querySelector('#mouseRightPopup'));
   }
 }
+function createPopup() {
+  createPopupBg();
+  const element = document.createElement('div');
+  element.setAttribute('class', 'popup');
+
+  const elementHead = document.createElement('div');
+  elementHead.appendChild(document.createTextNode('提示'))
+  elementHead.setAttribute('class', 'popup-head');
+  const elementBody = document.createElement('div');
+  elementBody.appendChild(document.createTextNode('提示信息'))
+  elementBody.setAttribute('class', 'popup-body');
+  const elementButton = document.createElement('div');
+  elementButton.appendChild(document.createTextNode('确定'))
+  elementButton.setAttribute('class', 'popup-botton');
+  elementButton.addEventListener('click', function () {
+    document.querySelector('.popup-bg').style.display = 'none'
+    document.querySelector('.popup').style.display = 'none'
+  })
+  element.appendChild(elementHead);
+  element.appendChild(elementBody);
+  element.appendChild(elementButton);
+
+  document.body.appendChild(element);
+}
+
+function createPopupBg() {
+  const element = document.createElement('div');
+  element.setAttribute('class', 'popup-bg');
+  document.body.appendChild(element);
+}
+
+
 module.exports = {
   createFileDomTree,
-  removeMouseRightPopup
+  removeMouseRightPopup,
+  createPopup
 };

@@ -1,4 +1,4 @@
-const { createFileDomTree, removeMouseRightPopup } = require('./utils/createDom')
+const { createFileDomTree, removeMouseRightPopup, createPopup } = require('./utils/createDom')
 const { createSocketConnection } = require('./utils/networkCommunication');
 const { readDirSync } = require('./utils/fileOperation');
 const { addDragListener } = require('./utils/eventListener');
@@ -62,6 +62,8 @@ function init() {
       removeMouseRightPopup();
     }
   })
-  addDragListener()
+  addDragListener();
+  // 预先创建一个隐藏的弹窗
+  createPopup();
 }
 init();
