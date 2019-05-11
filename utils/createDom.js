@@ -16,7 +16,6 @@ function createFileTreeDomRecursion(file) {
       currentLiDom.addEventListener('mouseup', function (e) {
         if (e.button == 2) {
           const path = findAllParentElementDataPath(e.target) + e.target.textContent;
-          // 获取文件保存在本地
           removeMouseRightPopup();
           createMouseEventDom({ clientX: e.clientX, clientY: e.clientY }, path)
 
