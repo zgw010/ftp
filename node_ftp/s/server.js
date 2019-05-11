@@ -4,7 +4,6 @@ const fs = require('fs');
 const ftpServerFileListJSONFile = 'fileList.json';
 
 let readerStream, writeStream;
-let ftpServerFileTree = {};
 let ftpServerFileRootPath = '/home/z/ftp/node_ftp/s/ftpFile';
 
 
@@ -14,6 +13,7 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
 
   socket.on('data', (data) => {
     if (data.toString().slice(0, 2) === 'ls') {
+      const ftpServerFileTree = {};
       requestFtpServerFileList(ftpServerFileRootPath, ftpServerFileTree);
       readerStream = fs.createReadStream(ftpServerFileListJSONFile);
       readerStream.pipe(socket);
