@@ -9,8 +9,8 @@ let ftpServerFileRootPath = '/home/z/ftp/node_ftp/s/ftpFile';
 const trafficStatistics = { bytesRead: 0, bytesWritten: 0 };
 
 const server = net.createServer({ allowHalfOpen: true }, (socket) => {
-  const clinetAddress = socket.address();
-  console.log('Established a connection from (', clinetAddress.address, clinetAddress.port, clinetAddress.family, ')');
+  const { address, port, family } = socket.address();
+  console.log('Established a connection from (', address, port, family, ')');
 
   socket.on('data', (data) => {
     if (data.toString().slice(0, 2) === 'ls') {
@@ -32,15 +32,24 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
   })
 
   socket.on('end', () => {
-    console.log('connection end (', clinetAddress.address, clinetAddress.port, clinetAddress.family, ')');
+    console.log('connection end (', address, port, family, ')');
 
     trafficStatistics.bytesRead += socket.bytesRead;
     console.log('接收的字节数量', trafficStatistics.bytesRead);
     trafficStatistics.bytesWritten += socket.bytesWritten;
-    console.log('发送的字节数量', trafficStatistics.bytesRead);
+    console.log('发送的字节数量', trafficStatistics.bytesWritten);
+    if (trafficStatistics[address]) {
+      trafficStatistics[address].bytesRead += socket.bytesRead;
+      trafficStatistics[address].bytesWritten += socket.bytesWritten;
+    } else {
+      trafficStatistics[address] = {
+        bytesRead: socket.bytesRead,
+        bytesWritten: socket.bytesWritten
+      };
+    }
   });
   socket.on('close', () => {
-    console.log('connection close (', clinetAddress.address, clinetAddress.port, clinetAddress.family, ')');
+    console.log('connection close (', address, port, family, ')');
   });
 });
 
