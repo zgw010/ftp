@@ -6,6 +6,7 @@ const ftpServerFileListJSONFile = 'fileList.json';
 let readerStream, writeStream;
 let ftpServerFileRootPath = '/home/z/ftp/node_ftp/s/ftpFile';
 
+const trafficStatistics = { bytesRead: 0, bytesWritten: 0 };
 
 const server = net.createServer({ allowHalfOpen: true }, (socket) => {
   const clinetAddress = socket.address();
@@ -32,6 +33,11 @@ const server = net.createServer({ allowHalfOpen: true }, (socket) => {
 
   socket.on('end', () => {
     console.log('connection end (', clinetAddress.address, clinetAddress.port, clinetAddress.family, ')');
+
+    trafficStatistics.bytesRead += socket.bytesRead;
+    console.log('接收的字节数量', trafficStatistics.bytesRead);
+    trafficStatistics.bytesWritten += socket.bytesWritten;
+    console.log('发送的字节数量', trafficStatistics.bytesRead);
   });
   socket.on('close', () => {
     console.log('connection close (', clinetAddress.address, clinetAddress.port, clinetAddress.family, ')');
