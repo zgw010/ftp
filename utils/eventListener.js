@@ -1,5 +1,6 @@
 const { findAllParentElementDataPath, judgeIsServerOrLocal } = require('./findFromDom');
 const { createSocketConnection } = require('./networkCommunication');
+const { insertAfter, createLi } = require('./createDom');
 const { getFileNameFromPath } = require('./utils');
 const ftpServerOptions = { port: 8124 }
 function addDragListener() {
@@ -41,31 +42,45 @@ function addDragListener() {
   document.addEventListener('drop', function (event) {
     // 拖动结束,开始处理文件传输
     const dragstartPath = localStorage.getItem('dragstartPath');
+    const target = event.target;
     let dragendPath;
-    if (event.target.tagName === 'LI') {
-      dragendPath = findAllParentElementDataPath(event.target);
+    if (target.tagName === 'LI') {
+      dragendPath = findAllParentElementDataPath(target);
     }
-    else if (event.target.className === 'catalog') {
-      dragendPath = findAllParentElementDataPath(event.target) + event.target.getAttribute('data-path');
+    else if (target.className === 'catalog') {
+      dragendPath = findAllParentElementDataPath(target) + target.getAttribute('data-path');
     }
-    const fileFrom = localStorage.getItem('fileFrom');
-    const fileNameFrom = getFileNameFromPath(dragstartPath);
-    const fileTo = judgeIsServerOrLocal(event.target);
-    const fileNameTo = getFileNameFromPath(fileTo);
-    if (fileFrom === 'local') {
-      if (fileTo === 'server') {
-        createSocketConnection(dragstartPath, 'put', ftpServerOptions, `put ${dragendPath}/${fileNameFrom}`, null, null)
-        console.log(getFileNameFromPath(dragstartPath), getFileNameFromPath(dragendPath));
+    if (target.tagName === 'LI' || target.className === 'catalog') {
+      const fileFrom = localStorage.getItem('fileFrom');
+      const fileNameFrom = getFileNameFromPath(dragstartPath);
+      const fileTo = judgeIsServerOrLocal(target);
+      const fileNameTo = getFileNameFromPath(fileTo);
+      if (fileFrom === 'local') {
+        if (fileTo === 'server') {
+          createSocketConnection(dragstartPath, 'put', ftpServerOptions, `put ${dragendPath}/${fileNameFrom}`, null, null)
+          if (target.tagName === 'LI') {
+            insertAfter(createLi(fileNameFrom), target);
+          } else {
+            console.log(target.nextSibling, target);
+            target.nextSibling.appendChild(createLi(fileNameFrom));
+          }
+          console.log(getFileNameFromPath(dragstartPath), getFileNameFromPath(dragendPath));
 
+        }
+      } else if (fileFrom === 'server') {
+        if (fileTo === 'local') {
+          createSocketConnection(`${dragendPath}/${fileNameFrom}`, 'get', ftpServerOptions, `get ${dragstartPath}`, null, null)
+          if (target.tagName === 'LI') {
+            insertAfter(createLi(fileNameFrom), target);
+          } else {
+            target.nextSibling.appendChild(createLi(fileNameFrom));
+          }
+          console.log(getFileNameFromPath(dragstartPath), getFileNameFromPath(dragendPath));
+        }
       }
-    } else if (fileFrom === 'server') {
-      if (fileTo === 'local') {
-        createSocketConnection(`${dragendPath}/${fileNameFrom}`, 'get', ftpServerOptions, `get ${dragstartPath}`, null, null)
-        console.log(getFileNameFromPath(dragstartPath), getFileNameFromPath(dragendPath));
-      }
+      console.log(dragstartPath, dragendPath);
+      event.target.style.background = "";
     }
-    console.log(dragstartPath, dragendPath);
-    event.target.style.background = "";
   })
 }
 

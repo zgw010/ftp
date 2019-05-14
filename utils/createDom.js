@@ -6,7 +6,21 @@ const { getFileNameFromPath } = require('./utils');
 
 const ftpOptions = { port: 8124 };
 function createFileTreeDomRecursion(file) {
-  const currentFileList = Object.keys(file.children)
+  let currentFileList = Object.keys(file.children);
+
+  // 对目录进行排序, 让文件目录显示在文件的前面
+  const _file = [];
+  const _directory = [];
+  currentFileList.forEach(fileName => {
+    if (file.children[fileName].htmlType === 'li') {
+      _file.push(fileName)
+    } else {
+      _directory.push(fileName)
+
+    }
+  })
+  currentFileList = _directory.concat(_file);
+
   const currentDom = document.createElement(file.htmlType);
   file = file.children;
   currentFileList.forEach(currentFile => {
@@ -59,7 +73,7 @@ function createFileTreeDomRecursion(file) {
 
 }
 
-function deleteFileAndRemoveDom(dom,dir) {
+function deleteFileAndRemoveDom(dom, dir) {
   removeDom(dom);
   deleteFileSync(dir);
 }
@@ -146,9 +160,37 @@ function createPopupBg() {
   document.body.appendChild(element);
 }
 
+function insertAfter(newElement, targetElement) {
+  const parentEl = targetElement.parentNode;
+
+  if (parentEl.lastChild === targetElement) {
+    parentEl.appendChild(newElement);
+  } else {
+    parentEl.insertBefore(newElement, targetElement.nextSibling);
+  }
+}
+
+function createLi(content) {
+  const currentLiDom = document.createElement('li');
+  currentLiDom.setAttribute('draggable', 'true')
+
+  currentLiDom.addEventListener('mouseup', function (e) {
+    if (e.button == 2) {
+      const path = findAllParentElementDataPath(e.target) + e.target.textContent;
+      removeMouseRightPopup();
+      createMouseEventDom(e.target, { clientX: e.clientX, clientY: e.clientY }, path)
+    }
+  })
+
+  const currentLiContent = document.createTextNode(content);
+  currentLiDom.appendChild(currentLiContent);
+  return currentLiDom;
+}
 
 module.exports = {
   createFileDomTree,
   removeMouseRightPopup,
-  createPopup
+  createPopup,
+  insertAfter,
+  createLi
 };
