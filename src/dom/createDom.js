@@ -1,8 +1,8 @@
-const { createSocketConnection } = require('./networkCommunication');
+const { createSocketConnection } = require('../net/networkCommunication');
 const { findAllParentElementDataPath } = require('./findFromDom');
 const { removeDom } = require('./removeDom')
-const { deleteFileSync } = require('./fileOperation')
-const { getFileNameFromPath } = require('./utils');
+const { deleteFileSync } = require('../file/fileOperation')
+const { getFileNameFromPath } = require('../utils/utils');
 
 const ftpOptions = { port: 8124 };
 function createFileTreeDomRecursion(file) {

@@ -1,7 +1,7 @@
-const { createFileDomTree, removeMouseRightPopup, createPopup } = require('./utils/createDom')
-const { createSocketConnection } = require('./utils/networkCommunication');
-const { readDirSync } = require('./utils/fileOperation');
-const { addDragListener } = require('./utils/eventListener');
+const { createFileDomTree, removeMouseRightPopup, createPopup } = require('./src/dom/createDom')
+const { createSocketConnection } = require('./src/net/networkCommunication');
+const { readDirSync } = require('./src/file/fileOperation');
+const { addDragListener } = require('./src/event/eventListener');
 
 //处理本地文件
 function createLocalFileTreeDom(path, domId = 'right') {
@@ -50,7 +50,7 @@ function initHideSubFile(buttonsClassName) {
 }
 
 function init() {
-  createLocalFileTreeDom('/home/z/blog', 'right');
+  createLocalFileTreeDom('/home/z/react', 'right');
   // 生成服务器目录树,之后调用 createServerFileTreeDom 来根据 JSON 文件构造服务器目录 DOM 树
   initServerFileListTree();
 

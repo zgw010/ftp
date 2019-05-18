@@ -1,7 +1,7 @@
-const { findAllParentElementDataPath, judgeIsServerOrLocal } = require('./findFromDom');
-const { createSocketConnection } = require('./networkCommunication');
-const { insertAfter, createLi } = require('./createDom');
-const { getFileNameFromPath } = require('./utils');
+const { findAllParentElementDataPath, judgeIsServerOrLocal } = require('../dom/findFromDom');
+const { createSocketConnection } = require('../net/networkCommunication');
+const { insertAfter, createLi } = require('../dom/createDom');
+const { getFileNameFromPath } = require('../utils/utils');
 const ftpServerOptions = { port: 8124 }
 function addDragListener() {
   document.addEventListener("dragstart", function (event) {

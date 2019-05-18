@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { showPromptPopup } = require('./utils')
+const { showPromptPopup } = require('../utils/utils')
 
 function readDirSync(dir, fileTreeObject = {}) {
   var pathList = fs.readdirSync(dir);
