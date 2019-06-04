@@ -61,10 +61,10 @@ function addDragListener() {
           if (target.tagName === 'LI') {
             insertAfter(createLi(fileNameFrom), target);
           } else {
-            console.log(target.nextSibling, target);
+            // console.log(target.nextSibling, target);
             target.nextSibling.appendChild(createLi(fileNameFrom));
           }
-          console.log(getFileNameFromPath(dragstartPath), getFileNameFromPath(dragendPath));
+          // console.log(getFileNameFromPath(dragstartPath), getFileNameFromPath(dragendPath));
 
         }
       } else if (fileFrom === 'server') {
@@ -75,10 +75,10 @@ function addDragListener() {
           } else {
             target.nextSibling.appendChild(createLi(fileNameFrom));
           }
-          console.log(getFileNameFromPath(dragstartPath), getFileNameFromPath(dragendPath));
+          // console.log(getFileNameFromPath(dragstartPath), getFileNameFromPath(dragendPath));
         }
       }
-      console.log(dragstartPath, dragendPath);
+      // console.log(dragstartPath, dragendPath);
       event.target.style.background = "";
     }
   })

@@ -18,7 +18,7 @@ function readDirSync(dir, fileTreeObject = {}) {
 }
 function deleteFileSync(dir) {
   try {
-    console.log(fs.statSync(dir).isDirectory());
+    // console.log(fs.statSync(dir).isDirectory());
     if (fs.statSync(dir).isDirectory()) {
       deleteDirectorySync(dir);
       showPromptPopup('删除文件夹成功')
@@ -28,7 +28,7 @@ function deleteFileSync(dir) {
     showPromptPopup('删除文件成功')
   } catch (err) {
     // 处理错误
-    console.log(err);
+    // console.log(err);
     console.log(`删除文件 [${dir}] 出错`);
   }
 }
